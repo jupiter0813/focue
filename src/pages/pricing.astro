@@ -1,0 +1,43 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { getPrices } from "@src/features/payment/service/get-prices";
+
+const prices = await getPrices();
+---
+
+<Layout title="Pricing.">
+    <h1 class="text-center text-5xl font-bold text-black">Pricing</h1>
+    <ul class="flex mx-auto max-w-5xl gap-10">
+        {
+            prices.map((price) => (
+                <li class="">
+                    <h2 class="text-2xl font-bold">{price.title}</h2>
+                    <p class="mt-4 text-3xl font-bold">${price.amount / 100}</p>
+                    <form action="/api/payment/create" class="group">
+                        <input type="hidden" name="priceId" value={price.id} />
+                        <button>Buy</button>
+                    </form>
+                </li>
+            ))
+        }
+    </ul>
+
+    <script>
+        import { actions } from "astro:actions";
+
+        const forms = document.querySelectorAll("form");
+        forms.forEach((form) => {
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const formData = new FormData(form);
+                const priceId = formData.get("priceId") as string;
+                const { data, error } = await actions.createCheckout({
+                    priceId: priceId,
+                });
+                if (!error) {
+                    window.location.href = data.url;
+                }
+            });
+        });
+    </script>
+</Layout>

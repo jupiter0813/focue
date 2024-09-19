@@ -1,12 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
-const test = {
-    asd: "asd",
-};
+const { user } = Astro.locals;
 ---
 
 <Layout title="Welcome to Astro.">
     <main class="">
         <h1>Home Page</h1>
+        <p>Welcome to Astro, {user?.email || "not-logged-in"}!</p>
+        {
+            user ? (
+                <form method="post" action="/api/auth/logout">
+                    <button>Logout</button>
+                </form>
+            ) : (
+                <a href="/login">Login</a>
+            )
+        }
     </main>
 </Layout>

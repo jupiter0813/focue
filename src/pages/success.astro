@@ -1,0 +1,17 @@
+---
+import Layout from "@layouts/Layout.astro";
+
+const { user } = Astro.locals;
+---
+
+<Layout title="success">
+    <h1>Success page</h1>
+    {
+        !user && (
+            <p>
+                Please login with the same email you put in stripe in order to
+                have access to the purchased plan.
+            </p>
+        )
+    }
+</Layout>
