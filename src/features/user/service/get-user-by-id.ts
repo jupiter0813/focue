@@ -41,6 +41,7 @@ export async function getUserById(params: GetUserByIdParams) {
             .values({
                 id: params.userId,
                 plan,
+                email: params.email,
             })
             .returning();
 

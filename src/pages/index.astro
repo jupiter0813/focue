@@ -6,7 +6,7 @@ const { user } = Astro.locals;
 <Layout title="Welcome to Astro.">
     <main class="">
         <h1>Home Page</h1>
-        <p>Welcome to Astro, {user?.email || "not-logged-in"}!</p>
+        <p>Welcome to Astro, {user?.email || "not-logged-in"}! You are on plan: {user?.plan}</p>
         {
             user ? (
                 <form method="post" action="/api/auth/logout">
@@ -16,5 +16,6 @@ const { user } = Astro.locals;
                 <a href="/login">Login</a>
             )
         }
+        <a href="/pricing">Pricing</a>
     </main>
 </Layout>

@@ -12,6 +12,7 @@ export const users = pgTable("user", {
     id: text("id").primaryKey(),
     role: text("role").$type<Role>().notNull().default("USER"),
     plan: text("plan").$type<Plan>().notNull().default("FREE"),
+    email: text("email"),
     ...updateAndCreatedAt,
 });
 

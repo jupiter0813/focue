@@ -1,6 +1,7 @@
 import { stripe } from "@lib/stripe";
 import db from "@src/db";
 import type { Plan } from "@src/db/schemas";
+import { getUserByEmail } from "@src/features/user/service/get-user-by-email";
 import { saveUserPurchase } from "@src/features/user/service/save-user-purchase";
 import { updateUserPlan } from "@src/features/user/service/update-user-role";
 import type { APIRoute } from "astro";
@@ -36,14 +37,16 @@ export const POST: APIRoute = async ({ request }) => {
         };
 
         if (event.type === "checkout.session.completed") {
-            const userId = completedEvent.metadata.userId;
+            let userId = completedEvent.metadata.userId;
             const plan = completedEvent.metadata.plan;
             const email =
                 completedEvent.customer_email ||
                 completedEvent.customer_details?.email ||
                 "";
             const total = completedEvent.amount_total || 0;
-
+            if(!userId){
+                userId = (await getUserByEmail({email}))?.id
+            }
             if (userId) {
                 await db.transaction(async (db) => {
                     await saveUserPurchase(

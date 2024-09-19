@@ -22,8 +22,9 @@ export const onRequest = defineMiddleware(
                 email: data.user.email,
             });
             locals.user = {
-                email: data.user.email,
+                email: user.email || data.user.email,
                 id: user.id,
+                plan: user.plan,
             };
         }
         return next();

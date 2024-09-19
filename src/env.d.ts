@@ -5,6 +5,7 @@ declare namespace App {
             | {
                   email: string | undefined;
                   id: string;
+                  plan: import("@src/db/schemas/index").Plan;
               }
             | undefined;
     }
