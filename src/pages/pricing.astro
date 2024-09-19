@@ -13,7 +13,7 @@ const prices = await getPrices();
                 <li class="">
                     <h2 class="text-2xl font-bold">{price.title}</h2>
                     <p class="mt-4 text-3xl font-bold">${price.amount / 100}</p>
-                    <form action="/api/payment/create" class="group">
+                    <form class="group">
                         <input type="hidden" name="priceId" value={price.id} />
                         <button>Buy</button>
                     </form>

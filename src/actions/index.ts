@@ -1,4 +1,5 @@
 import { getBaseUrl } from "@lib/helpers";
+import { createTimer, updateTimer } from "@src/db/queries";
 import { createStripeCheckout } from "@src/features/payment/service/create-stripe-checkout";
 import { getPriceById } from "@src/features/payment/service/get-price-by-id";
 import { ActionError, defineAction } from "astro:actions";
@@ -64,6 +65,53 @@ export const server = {
 
             return {
                 url: session.url,
+            };
+        },
+    }),
+    startTimer: defineAction({
+        input: z.object({}),
+        handler: async (_input, context) => {
+            const { user } = context.locals;
+
+            if (!user) {
+                throw new ActionError({
+                    code: "UNAUTHORIZED",
+                    message: "User is not authenticated",
+                });
+            }
+
+            // returns array of inserted rows
+            const [timer] = await createTimer({
+                userId: user.id,
+            });
+
+            return {
+                timerId: timer.id,
+            };
+        },
+    }),
+    stopTimer: defineAction({
+        input: z.object({
+            timerId: z.number(),
+        }),
+        handler: async (input, context) => {
+            const { user } = context.locals;
+
+            if (!user) {
+                throw new ActionError({
+                    code: "UNAUTHORIZED",
+                    message: "User is not authenticated",
+                });
+            }
+
+            // returns array of inserted rows
+            await updateTimer({
+                timerId: input.timerId,
+                userId: user.id,
+            });
+
+            return {
+                timerId: input.timerId,
             };
         },
     }),

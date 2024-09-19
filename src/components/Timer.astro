@@ -1,0 +1,83 @@
+---
+import { getActiveTimers } from "@src/db/queries";
+
+const { user } = Astro.locals;
+
+let time = 30 * 60; // 30 minutes in seconds
+let timeId: number | null = null;
+if(user && ['PREMIUM', 'BASIC'].includes(user.plan)){
+    const userTimer = await getActiveTimers({
+        userId: user.id,
+    })
+
+    if(userTimer.length > 0){
+        const timer = userTimer[0];
+        timeId = timer.id;
+        const startedAt = new Date(timer.startedAt).getTime();
+        const now = new Date().getTime();
+        const diff = now - startedAt;
+        time = Math.floor((30 * 60 - diff) / 1000);
+    }
+}
+
+console.log(time, timeId);
+// create a timer for 30 minutes
+---
+
+<div id="timer">
+    {time}
+</div>
+<button id="startButton">Start Timer</button>
+<button id="stopButton">Stop Timer</button>
+<input type="hidden" id="timeId" value={timeId} />
+
+<script>
+    import { actions } from "astro:actions";
+
+    let interval: NodeJS.Timeout;
+    let time = 30 * 60; // 30 minutes in seconds
+    const inputValue: HTMLInputElement = document.querySelector("#timeId")!;
+    let startedTimer: number | null = inputValue.value ? parseInt(inputValue.value) : null;
+    console.log(startedTimer);
+    if(startedTimer){
+        console.log('start timer');
+    }
+    document
+        .getElementById("startButton")!
+        .addEventListener("click",  async () => {
+            
+            const timerDisplay = document.getElementById("timer")!;
+            if(startedTimer){
+                return;
+            }
+            const {data, error} = await actions.startTimer({})
+            if(error){
+                console.log(error);
+                return;
+            }
+            startedTimer = data.timerId;
+
+            interval = setInterval(() => {
+                const minutes = Math.floor(time / 60);
+                const seconds = time % 60;
+
+                timerDisplay.textContent = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+
+                if (time <= 0) {
+                    clearInterval(interval);
+                    alert("Time is up!");
+                }
+
+                time--;
+            }, 1000);
+        });
+    document
+        .getElementById("stopButton")!
+        .addEventListener("click", async () => {
+            clearInterval(interval);
+            if(!startedTimer){
+                return;
+            }
+            await actions.stopTimer({timerId: startedTimer});
+        });
+</script>

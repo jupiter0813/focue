@@ -24,3 +24,13 @@ export const userPurchases = pgTable("user_purchases", {
     total: integer("total").notNull(),
     ...updateAndCreatedAt,
 });
+
+export const timers = pgTable("timers", {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+    startedAt: timestamp("started_at").notNull(),
+    stoppedAt: timestamp("stopped_at"),
+    duration: integer("duration"),
+
+    ...updateAndCreatedAt,
+});
